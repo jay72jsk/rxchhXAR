@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RXCHHxAR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css?family=Share+Tech+Mono|Montserrat:900&display=swap');
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #0a0a0a;
+    }
+
+    body {
+      height: 100vh;
+      width: 100vw;
+      position: relative;
+      font-family: 'Share Tech Mono', monospace;
+      color: #00ff99;
+    }
+
+    #matrix-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      background: #0a0a0a;
+      opacity: 0.85;
+    }
+
+    .center-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -55%);
+      z-index: 2;
+      text-align: center;
+      width: 100vw;
+      color: #00ff99;
+      text-shadow:
+        0 0 10px #00ff99,
+        0 0 20px #00ff99,
+        0 0 40px #009966;
+      font-family: 'Montserrat', 'Share Tech Mono', monospace;
+      font-size: 7vw;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .hack-words {
+      position: absolute;
+      z-index: 2;
+      font-family: 'Share Tech Mono', monospace;
+      color: #00ff99;
+      font-size: 1.2vw;
+      opacity: 0.81;
+      text-shadow: 0 0 7px #00ff99, 0 0 18px #009966;
+      user-select: none;
+      pointer-events: none;
+      animation: flicker 2.5s infinite alternate;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 0.81; }
+      20% { opacity: 0.95; }
+      40% { opacity: 0.7; }
+      60% { opacity: 0.93; }
+      80% { opacity: 0.8; }
+      100% { opacity: 0.81; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix-canvas"></canvas>
+  <div class="center-text">RXCHHxAR</div>
+  <div class="hack-words" style="top: 8%; left: 5%;">packed by rxchh</div>
+  <div class="hack-words" style="top: 87%; left: 12%;">you folded lmao</div>
+  <div class="hack-words" style="top: 80%; right: 10%;">AR ran you lollol</div>
+  <script>
+    // Matrix Effect
+    const canvas = document.getElementById('matrix-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    let fontSize = Math.max(18, width / 75);
+    let columns = Math.floor(width / fontSize);
+
+    // Array of drops - one per column
+    let drops = Array(columns).fill(1);
+
+    function draw() {
+      ctx.fillStyle = 'rgba(10, 10, 10, 0.15)';
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.font = fontSize + "px 'Share Tech Mono', monospace";
+      ctx.fillStyle = "#00ff99";
+      for (let i = 0; i < drops.length; i++) {
+        let num = Math.random() < 0.5 ? "000" : "999";
+        ctx.fillText(num, i * fontSize, drops[i] * fontSize);
+
+        if (Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+        if (drops[i] * fontSize > height) {
+          drops[i] = 0;
+        }
+      }
+    }
+
+    setInterval(draw, 45);
+
+    window.addEventListener('resize', () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      fontSize = Math.max(18, width / 75);
+      columns = Math.floor(width / fontSize);
+      drops = Array(columns).fill(1);
+    });
+  </script>
+</body>
+</html>
