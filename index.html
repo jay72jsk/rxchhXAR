@@ -23,13 +23,17 @@
       color: #00ff99;
     }
 
-    #matrix-canvas {
+    #matrix-canvas, #words-canvas {
       position: fixed;
       top: 0; left: 0;
       width: 100vw;
       height: 100vh;
       z-index: 0;
-      background: #0a0a0a;
+      pointer-events: none;
+      background: transparent;
+    }
+
+    #matrix-canvas {
       opacity: 0.85;
     }
 
@@ -54,44 +58,21 @@
       pointer-events: none;
     }
 
-    .hack-words {
-      position: absolute;
-      z-index: 2;
-      font-family: 'Share Tech Mono', monospace;
-      color: #00ff99;
-      font-size: 1.2vw;
-      opacity: 0.81;
-      text-shadow: 0 0 7px #00ff99, 0 0 18px #009966;
-      user-select: none;
-      pointer-events: none;
-      animation: flicker 2.5s infinite alternate;
-    }
-
-    @keyframes flicker {
-      0% { opacity: 0.81; }
-      20% { opacity: 0.95; }
-      40% { opacity: 0.7; }
-      60% { opacity: 0.93; }
-      80% { opacity: 0.8; }
-      100% { opacity: 0.81; }
-    }
   </style>
 </head>
 <body>
   <canvas id="matrix-canvas"></canvas>
+  <canvas id="words-canvas"></canvas>
   <div class="center-text">RXCHHxAR</div>
-  <div class="hack-words" style="top: 8%; left: 5%;">packed by rxchh</div>
-  <div class="hack-words" style="top: 87%; left: 12%;">you folded lmao</div>
-  <div class="hack-words" style="top: 80%; right: 10%;">AR ran you lollol</div>
   <script>
     // Matrix Effect
-    const canvas = document.getElementById('matrix-canvas');
-    const ctx = canvas.getContext('2d');
+    const matrixCanvas = document.getElementById('matrix-canvas');
+    const matrixCtx = matrixCanvas.getContext('2d');
 
     let width = window.innerWidth;
     let height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
+    matrixCanvas.width = width;
+    matrixCanvas.height = height;
 
     let fontSize = Math.max(18, width / 75);
     let columns = Math.floor(width / fontSize);
@@ -99,15 +80,15 @@
     // Array of drops - one per column
     let drops = Array(columns).fill(1);
 
-    function draw() {
-      ctx.fillStyle = 'rgba(10, 10, 10, 0.15)';
-      ctx.fillRect(0, 0, width, height);
+    function drawMatrix() {
+      matrixCtx.fillStyle = 'rgba(10, 10, 10, 0.15)';
+      matrixCtx.fillRect(0, 0, width, height);
 
-      ctx.font = fontSize + "px 'Share Tech Mono', monospace";
-      ctx.fillStyle = "#00ff99";
+      matrixCtx.font = fontSize + "px 'Share Tech Mono', monospace";
+      matrixCtx.fillStyle = "#00ff99";
       for (let i = 0; i < drops.length; i++) {
         let num = Math.random() < 0.5 ? "000" : "999";
-        ctx.fillText(num, i * fontSize, drops[i] * fontSize);
+        matrixCtx.fillText(num, i * fontSize, drops[i] * fontSize);
 
         if (Math.random() > 0.975) {
           drops[i] = 0;
@@ -118,17 +99,75 @@
         }
       }
     }
+    setInterval(drawMatrix, 45);
 
-    setInterval(draw, 45);
+    // Red hack phrases canvas
+    const wordsCanvas = document.getElementById('words-canvas');
+    const wordsCtx = wordsCanvas.getContext('2d');
+    wordsCanvas.width = width;
+    wordsCanvas.height = height;
 
+    const hackWords = [
+      "packed by rxchh",
+      "you folded lmao",
+      "AR ran you lolol"
+    ];
+
+    // Generate random word positions
+    function randomWordPositions(count) {
+      let positions = [];
+      for (let i = 0; i < count; i++) {
+        let word = hackWords[Math.floor(Math.random() * hackWords.length)];
+        let x = Math.random() * width;
+        let y = Math.random() * height;
+        let angle = (Math.random() - 0.5) * 0.4; // -0.2 to +0.2 radians
+        let size = Math.random() * 14 + 13; // 13 to 27 px
+        positions.push({ word, x, y, angle, size });
+      }
+      return positions;
+    }
+
+    let wordsCount = Math.floor((width * height) / 20000) + 15;
+    let wordPositions = randomWordPositions(wordsCount);
+
+    function drawHackWords() {
+      wordsCtx.clearRect(0, 0, width, height);
+      for (const { word, x, y, angle, size } of wordPositions) {
+        wordsCtx.save();
+        wordsCtx.translate(x, y);
+        wordsCtx.rotate(angle);
+        wordsCtx.font = `${size}px 'Share Tech Mono', monospace`;
+        wordsCtx.globalAlpha = 0.29 + Math.random() * 0.17;
+        wordsCtx.shadowColor = "#ff0000";
+        wordsCtx.shadowBlur = 8;
+        wordsCtx.fillStyle = "#ff2222";
+        wordsCtx.fillText(word, 0, 0);
+        wordsCtx.restore();
+      }
+    }
+
+    // Animation for subtle flicker
+    function animateWords() {
+      drawHackWords();
+      requestAnimationFrame(animateWords);
+    }
+    animateWords();
+
+    // Handle resizing
     window.addEventListener('resize', () => {
       width = window.innerWidth;
       height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
+      matrixCanvas.width = width;
+      matrixCanvas.height = height;
+      wordsCanvas.width = width;
+      wordsCanvas.height = height;
+
       fontSize = Math.max(18, width / 75);
       columns = Math.floor(width / fontSize);
       drops = Array(columns).fill(1);
+
+      wordsCount = Math.floor((width * height) / 20000) + 15;
+      wordPositions = randomWordPositions(wordsCount);
     });
   </script>
 </body>
